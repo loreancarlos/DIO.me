@@ -1,4 +1,4 @@
-# [DIO.me](dio.me)
+# [DIO.me](https://dio.me/)
 Este repositório contem todo o conteúdo aglutinado em meu cérebro, durante e após vários bootcamps e projetos práticos executados com o auxílio da plataforma DIO.me.
 
 ## [Orange Tech Plus Inter](https://github.com/loreancarlos/DIO.me/tree/main/Orange_Tech_Plus_Inter)
