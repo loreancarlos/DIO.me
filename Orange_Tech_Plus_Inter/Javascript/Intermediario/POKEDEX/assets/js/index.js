@@ -1,3 +1,3 @@
-import { PokeView } from "./pokeView.js";
+import { PokeEvent } from './pokeEvents.js';
 
-new PokeView('.cards-wrapper');
+new PokeEvent('.cards-wrapper');

@@ -3,72 +3,123 @@ import { PokeController } from './pokeController.js';
 export class PokeView extends PokeController {
    constructor(root) {
       super(root);
-      this.update({}, 20);
+      this.update();
    }
 
-   async update(offset, limit) {
-      const listOfPokemons = await this.index(offset, limit);
-
-      for (let i = 0; i < listOfPokemons.length; i++) {
-         const pokemonData = await this.show(listOfPokemons[i].name);
-         pokemonData.name = pokemonData.name[0].toUpperCase() + pokemonData.name.substring(1);
+   async update() {
+      const listOfPokemons = await this.index();
+      listOfPokemons.forEach(pokemon => {
          const card = document.createElement('li');
-         card.classList = 'card';
-         if (pokemonData.types[0].type.name === 'grass') {
-            card.classList += ' green';
-         } else if (pokemonData.types[0].type.name === 'fire') {
-            card.classList += ' red';
-         } else {
-            card.classList += ' blue';
-         }
-         card.innerHTML = this.createCard(pokemonData);
+         card.classList = 'card ' + pokemon.types[0].type.name;
+         card.innerHTML = this.createCardOfPokemons(pokemon);
          this.root.append(card);
-      }
+      });
+      this.add();
    }
 
-   createCard(pokemon) {
-      let types = '';
-      pokemon.types.map(({ type }) => {
-         type.name = type.name[0].toUpperCase() + type.name.substring(1);
-         types += `<li>${type.name}</li>`
+   clear(buttonOffset) {
+      buttonOffset.toggleAttribute('hidden');
+      this.root.innerHTML = '';
+   }
+
+   createListTypes(pokemonTypes) {
+      return pokemonTypes.map(({ type }) => {
+         return `<li>${type.name}</li>`;
       });
+   }
 
-      const id = (pokemon.id).toLocaleString('pt-BR', {
-         minimumIntegerDigits: 5,
-         useGrouping: false
-      })
-
+   createCardOfPokemons(pokemon) {
       return `
-         <span class="poke-number">#${id}</span>
+         <span class="poke-number">#${pokemon.id}</span>
          <span class="poke-name">${pokemon.name}</span>
          <div class="poke-data">
             <ol class="poke-type">
-               ${types}
+               ${this.createListTypes(pokemon.types).join('')}
             </ol>
             <div>
                <img
-                  src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${pokemon.id}.svg"
+                  src="${pokemon.sprites.other.dream_world.front_default}"
                   alt="${pokemon.name}">
             </div>
          </div>
       `;
    }
+
+   async detailCard(card) {
+      this.root.classList = 'detailCard-wrapper';
+
+      const pokemon = await this.show(card.firstElementChild.innerText.substring(1));
+      this.createCardOfPokemons(pokemon);
+      const detailCard = document.createElement('li');
+      detailCard.classList = 'detailCard ' + pokemon.types[0].type.name;
+      detailCard.innerHTML = this.createDetailCard(pokemon);
+      this.root.append(detailCard);
+      this.back();
+   }
+
+   createDetailCard(pokemon) {
+      return `
+               <div class='menu-wrapper'>
+                  <button class='backButton'>
+                     <img
+                     src="./assets/media/botao-voltar.png"
+                     alt="Voltar">
+                  </button>
+                  <button class='star'>
+                     <img
+                     src="./assets/media/estrela.png"
+                     alt="Voltar">
+                  </button>
+               </div>
+               <div class='headInfo'>
+                  <div>
+                     <span>${pokemon.name}</span>
+                     <ul>
+                        ${this.createListTypes(pokemon.types).join('')}
+                     </ul>
+                  </div>
+                  <span>#${pokemon.id}</span>
+               </div>
+               <div class='image-wrapper'>
+                  <img
+                  src="${pokemon.sprites.other.dream_world.front_default}"
+                  alt="${pokemon.name}">
+               </div>
+               <div class='footerInfo'>
+                  <fieldset>
+                     <legend>About</legend>
+                     <div class='about'>
+                        <div class='stats'>
+                           <span>HP</span>
+                           <span>Attack</span>
+                           <span>Defense</span>
+                           <span>Speed</span>
+                        </div>
+                        <div class='stats'>
+                           <span>${pokemon.stats[0].base_stat}</span>
+                           <span>${pokemon.stats[1].base_stat}</span>
+                           <span>${pokemon.stats[2].base_stat}</span>
+                           <span>${pokemon.stats[5].base_stat}</span>
+                        </div>
+                     </div>
+                  </fieldset>
+                  <fieldset>
+                     <legend>Breeding</legend>
+                     <div class='about'>
+                        <div class='stats'>
+                           <span>Gender</span>
+                           <span>Egg Groups</span>
+                           <span>Egg Cycle</span>
+                        </div>
+                        <div class='stats'>
+                           <span>Gender 1</span>
+                           <span>Egg Groups</span>
+                           <span>Egg Cycle</span>
+                        </div>
+                     </div>
+                  </fieldset>
+               </div>
+            </li>
+   `;
+   }
 }
-/* 
-async function getDataApi() {
-
-   listOfPokemons.map(async (pokemon) => {
-
-
-      const pokemonData = await fetch(url)
-         .then(data => data.json())
-         .catch(error => console.log(error));
-
-      
-      const li = document.createElement('li');
-      li.classList = 'card';
-      li.innerHTML = createCard(pokemonData);
-      li.style.backgroundColor =
-         cards.append(li);
-   });
-} */
